@@ -1,0 +1,7 @@
+SELECT EmployeeId,e.LastName, sum(total) as totals
+FROM Employee as e
+JOIN Customer as c
+ON e.EmployeeId = c.SupportRepId
+JOIN Invoice as i
+ON c.CustomerId = i.CustomerId
+GROUP BY 1

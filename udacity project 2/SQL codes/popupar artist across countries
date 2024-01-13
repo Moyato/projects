@@ -1,0 +1,25 @@
+WITH popular_Artist AS (
+SELECT c.Country as countries, COUNT(ar.name) no_of_purchase,ar.Name as artists,
+	RANK() OVER(PARTITION BY c.Country ORDER BY COUNT(ar.Name) DESC) AS rank
+FROM Genre as g
+JOIN Track as t
+ON g.GenreId = t.GenreId
+JOIN InvoiceLine as il
+ON t.TrackId = il.TrackId
+JOIN Invoice as i
+ON i.InvoiceId = il.InvoiceId
+JOIN Customer as c
+ON c.CustomerId = i.CustomerId
+JOIN Album as a
+ON a.AlbumId = t.AlbumId
+JOIN Artist as ar
+ON ar.ArtistId = a.ArtistId
+GROUP BY c.Country,ar.Name
+ORDER BY c.Country, no_of_purchase DESC)
+SELECT Countries, no_of_purchase, artists,
+CASE WHEN no_of_purchase >=30 THEN 'Big artist'
+WHEN no_of_purchase <30 AND no_of_purchase >=10 THEN 'Popular'
+ELSE 'Fairly popular'
+END AS level
+FROM popular_Artist
+WHERE rank=1

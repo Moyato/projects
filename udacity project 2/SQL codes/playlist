@@ -1,0 +1,16 @@
+WITH genre_playlist as (
+SELECT p.Name as playlist_name,g.Name as genres,count(p.Name) as totals,
+rank() OVER(PARTITION BY p.Name ORDER BY count(p.Name) DESC) as ranks
+FROM Playlist AS p
+JOIN PlaylistTrack as pt
+ON p.PlaylistId = pt.PlaylistId
+JOIN Track as t
+ON pt.TrackId = t.TrackId
+JOIN Genre as g
+ON g.GenreId = t.GenreId
+GROUP BY 1,2)
+
+SELECT playlist_name,genres,totals,
+ntile(4) OVER(PARTITION BY genres) as quartiles
+FROM genre_playlist
+WHERE ranks = 1
